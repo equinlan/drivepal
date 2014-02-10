@@ -30,7 +30,9 @@ class Spreadsheet
     # Drop payment if it already exists in spreadsheet...
     for row in 2..@ws.num_rows
       # ...but not if it exists with a different state
-      new_payments = new_payments.delete_if { |payment| payment.id == @ws[row, 1] && payment.state == @ws[row, 4] }
+      new_payments = new_payments.delete_if { |payment|
+        payment.id == @ws[row, 1] && payment.state == @ws[row, 4]
+        }
     end
     
     return new_payments
