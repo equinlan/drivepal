@@ -7,7 +7,7 @@ class Account
   def initialize(parameters)
     paypal = parameters['Paypal']
     PayPal::SDK.configure(
-      mode:          "sandbox", # "sandbox" or "live"
+      mode:          "live", # "sandbox" or "live"
       client_id:     paypal['client id'],
       client_secret: paypal['client secret key'])
   end
