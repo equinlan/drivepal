@@ -45,45 +45,37 @@ class Spreadsheet
     
     # Add headers if they don't exist
     if row = 1
-      @ws[row, 1] = "ID"
-      @ws[row, 2] = "Created At"
-      @ws[row, 3] = "Updated At"
-      @ws[row, 4] = "State"
-      @ws[row, 5] = "Payment Method"
-      @ws[row, 6] = "Amount"
-      @ws[row, 7] = "Description"
-      @ws[row, 8] = "Email"
-      @ws[row, 9] = "First Name"
-      @ws[row, 10] = "Last Name"
-      @ws[row, 11] = "Phone"
-      @ws[row, 12] = "Shipping Address"
+      headers = ["ID", "Created At", "Updated At", "State", "Payment Method",
+          "Amount", "Description", "Email", "First Name", "Last Name", "Phone",
+          "Shipping Address"]
+      for col in 1..headers.size
+        @ws[row, col] = headers[col - 1]
+      end
     end
     
     dedupe(account.payments).each do |payment|
       payment.transactions.each do |transaction|
-        @ws[row, 1] = payment.id
-        @ws[row, 2] = payment.create_time
-        @ws[row, 3] = payment.update_time
-        @ws[row, 4] = payment.state
         
+        # Some typing shortcuts
         payer = payment.payer
-        @ws[row, 5] = payer.payment_method
-        
-        @ws[row, 6] = transaction.amount
-        @ws[row, 7] = transaction.description
-        
         payer_info = payer.payer_info
-        @ws[row, 8] = payer_info.email
-        @ws[row, 9] = payer_info.first_name
-        @ws[row, 10] = payer_info.last_name
-        @ws[row, 11] = payer_info.phone
-        
         address = payer_info.shipping_address
-        @ws[row, 12] = "#{address.line1}, #{address.line2}, "\
+        
+        # Prepare the data to appear in columns
+        data = [payment.id, payment.create_time, payment.update_time, payment.state,
+          payer.payment_method, transaction.amount, transaction.description,
+          payer_info.email, payer_info.first_name, payer_info.last_name,
+          payer_info.phone, "#{address.line1}, #{address.line2}, "\
           "#{address.city}, #{address.state} #{address.postal_code}, "\
-          "#{address.country_code}"
+          "#{address.country_code}"]
+        
+        # Print the data for the current row
+        for col in 1..data.size
+          @ws[row, col] = data[col - 1]
+        end
       
-      row +=1
+        # Next row
+        row +=1
       end
     end
     @ws.save
