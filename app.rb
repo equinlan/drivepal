@@ -7,7 +7,7 @@ class Account
   def initialize(parameters)
     paypal = parameters['Paypal']
     PayPal::SDK.configure(
-      mode:          "live", # "sandbox" or "live"
+      mode:          "sandbox", # "sandbox" or "live"
       client_id:     paypal['client id'],
       client_secret: paypal['client secret key'])
   end
@@ -44,13 +44,15 @@ class Spreadsheet
     row = first_empty_row
     
     # Add headers if they don't exist
-    if row = 1
-      headers = ["ID", "Created At", "Updated At", "State", "Payment Method",
-          "Amount", "Description", "Email", "First Name", "Last Name", "Phone",
-          "Shipping Address"]
+    if row == 1
+      headers = ["ID", "Created At", "State", "Payment Method",
+        "Amount", "Currency", "Description", "Email", "First Name",
+        "Last Name", "Phone"]
       for col in 1..headers.size
         @ws[row, col] = headers[col - 1]
       end
+      
+      row += 1
     end
     
     dedupe(account.payments).each do |payment|
@@ -59,19 +61,17 @@ class Spreadsheet
         # Some typing shortcuts
         payer = payment.payer
         payer_info = payer.payer_info
-        address = payer_info.shipping_address
+        amount = transaction.amount
         
         # Prepare the data to appear in columns
-        data = [payment.id, payment.create_time, payment.update_time, payment.state,
-          payer.payment_method, transaction.amount, transaction.description,
-          payer_info.email, payer_info.first_name, payer_info.last_name,
-          payer_info.phone, "#{address.line1}, #{address.line2}, "\
-          "#{address.city}, #{address.state} #{address.postal_code}, "\
-          "#{address.country_code}"]
+        data = [payment.id, payment.create_time, payment.state,
+          payer.payment_method, amount.total, amount.currency,
+          transaction.description, payer_info.email,
+          payer_info.first_name, payer_info.last_name, payer_info.phone]
         
         # Print the data for the current row
         for col in 1..data.size
-          @ws[row, col] = data[col - 1]
+          @ws[row, col] = data[col - 1] || "N/A"
         end
       
         # Next row
