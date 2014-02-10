@@ -1,0 +1,8 @@
+---
+Google Drive:
+  username: YOUR_EMAIL
+  password: YOUR_PASSWORD
+  spreadsheet key: ALPHANUMERIC_STRING
+Paypal:
+  client id: ALPHANUMERIC_STRING
+  client secret key: ALPHANUMERIC_STRING
